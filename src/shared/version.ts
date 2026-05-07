@@ -1,5 +1,5 @@
-export const appVersion = import.meta.env.VITE_APP_VERSION || "0.1.0";
-export const gitCommit = import.meta.env.VITE_GIT_COMMIT || "dev";
+export const appVersion = __APP_VERSION__;
+export const gitCommit = __GIT_COMMIT__;
 
 export function shortCommit(commit: string): string {
   return commit.length > 7 ? commit.slice(0, 7) : commit;
