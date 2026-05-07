@@ -1,6 +1,12 @@
 import type { Puzzle } from "../puzzles/schema";
 
-export type SolveStatus = "idle" | "initializing" | "sat" | "unsat" | "unknown" | "error";
+export type SolveStatus =
+  | "idle"
+  | "initializing"
+  | "sat"
+  | "unsat"
+  | "unknown"
+  | "error";
 
 export type Assignment = {
   label: string;

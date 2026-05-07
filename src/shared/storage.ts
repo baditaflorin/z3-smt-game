@@ -4,7 +4,7 @@ const storageSchema = z.object({
   selectedPuzzleId: z.string().optional(),
   completedPuzzleIds: z.array(z.string()).default([]),
   llmEndpoint: z.string().default("http://localhost:11434/api/generate"),
-  llmModel: z.string().default("llama3.2")
+  llmModel: z.string().default("llama3.2"),
 });
 
 export type StoredState = z.infer<typeof storageSchema>;

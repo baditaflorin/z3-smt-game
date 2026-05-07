@@ -15,6 +15,7 @@
     "prepreview": "npm run sync-public-assets",
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run --coverage=false",
+    "test:e2e": "playwright test",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "fmt": "prettier --write .",

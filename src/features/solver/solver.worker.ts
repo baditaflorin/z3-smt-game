@@ -17,7 +17,10 @@ type EncoderOutput = {
   solver: InstanceType<GameContext["Solver"]>;
   ctx: GameContext;
   variables: Record<string, IntExpr>;
-  labels: Record<string, { label: string; group: string; format?: (value: number) => string }>;
+  labels: Record<
+    string,
+    { label: string; group: string; format?: (value: number) => string }
+  >;
   diagram: (assignments: Record<string, number>) => string;
   facts: string[];
   constraints: number;
@@ -49,8 +52,9 @@ const localInitZ3 = async (): Promise<Z3Api> => {
 
       globalThis.initZ3 = () =>
         rawInitZ3({
-          locateFile: (path: string) => (path.endsWith(".wasm") ? z3WasmUrl : z3ScriptUrl),
-          mainScriptUrlOrBlob: z3ScriptUrl
+          locateFile: (path: string) =>
+            path.endsWith(".wasm") ? z3WasmUrl : z3ScriptUrl,
+          mainScriptUrlOrBlob: z3ScriptUrl,
         });
 
       const { init } = await import("z3-solver/build/browser.js");
@@ -61,15 +65,28 @@ const localInitZ3 = async (): Promise<Z3Api> => {
   return z3Promise;
 };
 
-function domain(ctx: GameContext, value: IntExpr, min: number, max: number): BoolExpr[] {
+function domain(
+  ctx: GameContext,
+  value: IntExpr,
+  min: number,
+  max: number,
+): BoolExpr[] {
   return [value.ge(min), value.le(max)];
 }
 
-function exactlyOneOf(ctx: GameContext, value: IntExpr, allowed: number[]): BoolExpr {
+function exactlyOneOf(
+  ctx: GameContext,
+  value: IntExpr,
+  allowed: number[],
+): BoolExpr {
   return ctx.Or(...allowed.map((candidate) => value.eq(candidate)));
 }
 
-function addAllDifferent(ctx: GameContext, solver: InstanceType<GameContext["Solver"]>, values: IntExpr[]): void {
+function addAllDifferent(
+  ctx: GameContext,
+  solver: InstanceType<GameContext["Solver"]>,
+  values: IntExpr[],
+): void {
   solver.add(ctx.Distinct(...values));
 }
 
@@ -96,7 +113,7 @@ function encodeMansion(z3: Z3Api): EncoderOutput {
     coraRoom: Int.const("cora_room"),
     adaItem: Int.const("ada_item"),
     brunoItem: Int.const("bruno_item"),
-    coraItem: Int.const("cora_item")
+    coraItem: Int.const("cora_item"),
   };
   const rooms = [variables.adaRoom, variables.brunoRoom, variables.coraRoom];
   const items = [variables.adaItem, variables.brunoItem, variables.coraItem];
@@ -115,8 +132,8 @@ function encodeMansion(z3: Z3Api): EncoderOutput {
     ctx.Or(
       ctx.And(variables.adaRoom.eq(2), variables.adaItem.eq(2)),
       ctx.And(variables.brunoRoom.eq(2), variables.brunoItem.eq(2)),
-      ctx.And(variables.coraRoom.eq(2), variables.coraItem.eq(2))
-    )
+      ctx.And(variables.coraRoom.eq(2), variables.coraItem.eq(2)),
+    ),
   );
 
   return {
@@ -128,16 +145,24 @@ function encodeMansion(z3: Z3Api): EncoderOutput {
       brunoRoom: { label: "Bruno room", group: "Rooms", format: roomName },
       coraRoom: { label: "Cora room", group: "Rooms", format: roomName },
       adaItem: { label: "Ada artifact", group: "Artifacts", format: itemName },
-      brunoItem: { label: "Bruno artifact", group: "Artifacts", format: itemName },
-      coraItem: { label: "Cora artifact", group: "Artifacts", format: itemName }
+      brunoItem: {
+        label: "Bruno artifact",
+        group: "Artifacts",
+        format: itemName,
+      },
+      coraItem: {
+        label: "Cora artifact",
+        group: "Artifacts",
+        format: itemName,
+      },
     },
     diagram: mansionDiagram,
     facts: [
       "Two all-different sets interact: each room and each artifact can be used once.",
       "The Library-Key clue links two domains, so assigning a room immediately constrains an artifact.",
-      "Z3 prunes the grid by propagating equalities before it has to search."
+      "Z3 prunes the grid by propagating equalities before it has to search.",
     ],
-    constraints: 15
+    constraints: 15,
   };
 }
 
@@ -150,7 +175,7 @@ function encodeLineup(z3: Z3Api): EncoderOutput {
     boards: Int.const("boards"),
     circuits: Int.const("circuits"),
     demos: Int.const("demos"),
-    encoding: Int.const("encoding")
+    encoding: Int.const("encoding"),
   };
   const talks = Object.values(variables);
 
@@ -173,15 +198,15 @@ function encodeLineup(z3: Z3Api): EncoderOutput {
       boards: { label: "Boards", group: "Talks", format: slotName },
       circuits: { label: "Circuits", group: "Talks", format: slotName },
       demos: { label: "Demos", group: "Talks", format: slotName },
-      encoding: { label: "Encoding", group: "Talks", format: slotName }
+      encoding: { label: "Encoding", group: "Talks", format: slotName },
     },
     diagram: lineupDiagram,
     facts: [
       "The adjacency clue creates a tight pair, so moving Demos automatically moves Boards.",
       "All-different turns every slot choice into exclusions for the other talks.",
-      "The third-slot anchor lets Z3 propagate order constraints before branching."
+      "The third-slot anchor lets Z3 propagate order constraints before branching.",
     ],
-    constraints: 18
+    constraints: 18,
   };
 }
 
@@ -192,7 +217,7 @@ function encodeCrates(z3: Z3Api): EncoderOutput {
   const variables = {
     red: Int.const("red"),
     blue: Int.const("blue"),
-    green: Int.const("green")
+    green: Int.const("green"),
   };
   const crates = Object.values(variables);
 
@@ -213,15 +238,15 @@ function encodeCrates(z3: Z3Api): EncoderOutput {
     labels: {
       red: { label: "Red crate", group: "Weights", format: kilogramName },
       blue: { label: "Blue crate", group: "Weights", format: kilogramName },
-      green: { label: "Green crate", group: "Weights", format: kilogramName }
+      green: { label: "Green crate", group: "Weights", format: kilogramName },
     },
     diagram: crateDiagram,
     facts: [
       "The domain is finite, but the arithmetic equalities cut through it faster than enumeration.",
       "Oddness is encoded as a small disjunction, a classic SAT-style choice inside an integer problem.",
-      "The less-than clue removes the lighter branch and leaves a single model."
+      "The less-than clue removes the lighter branch and leaves a single model.",
     ],
-    constraints: 17
+    constraints: 17,
   };
 }
 
@@ -243,11 +268,12 @@ function kilogramName(value: number): string {
 
 function mansionDiagram(assignments: Record<string, number>): string {
   const people = ["ada", "bruno", "cora"] as const;
-  const label = (person: (typeof people)[number]) => person[0].toUpperCase() + person.slice(1);
+  const label = (person: (typeof people)[number]) =>
+    person[0].toUpperCase() + person.slice(1);
   const edges = people
     .flatMap((person) => [
       `${label(person)} --> ${roomName(assignments[`${person}Room`]).replaceAll(" ", "")}`,
-      `${label(person)} --> ${itemName(assignments[`${person}Item`]).replaceAll(" ", "")}`
+      `${label(person)} --> ${itemName(assignments[`${person}Item`]).replaceAll(" ", "")}`,
     ])
     .join("\n");
 
@@ -267,7 +293,7 @@ function lineupDiagram(assignments: Record<string, number>): string {
     Boards: assignments.boards,
     Circuits: assignments.circuits,
     Demos: assignments.demos,
-    Encoding: assignments.encoding
+    Encoding: assignments.encoding,
   }).sort((left, right) => left[1] - right[1]);
 
   return `flowchart LR
@@ -312,24 +338,30 @@ async function solve(request: SolveRequest): Promise<SolveResponse> {
         status,
         durationMs,
         assignments: [],
-        diagram: "flowchart LR\nNoModel[\"No satisfying model\"]",
+        diagram: 'flowchart LR\nNoModel["No satisfying model"]',
         smtlib: encoded.solver.toSmtlib2(status),
         model: "",
         difficultyFacts: encoded.facts,
-        stats: { variables: Object.keys(encoded.variables).length, constraints: encoded.constraints }
+        stats: {
+          variables: Object.keys(encoded.variables).length,
+          constraints: encoded.constraints,
+        },
       };
     }
 
     const model = encoded.solver.model();
     const rawAssignments = Object.fromEntries(
-      Object.entries(encoded.variables).map(([key, expr]) => [key, intValue(encoded.ctx, model, expr)])
+      Object.entries(encoded.variables).map(([key, expr]) => [
+        key,
+        intValue(encoded.ctx, model, expr),
+      ]),
     );
     const assignments = Object.entries(encoded.labels).map(([key, meta]) => {
       const value = rawAssignments[key];
       return {
         label: meta.label,
         group: meta.group,
-        value: meta.format ? meta.format(value) : String(value)
+        value: meta.format ? meta.format(value) : String(value),
       };
     });
 
@@ -343,7 +375,10 @@ async function solve(request: SolveRequest): Promise<SolveResponse> {
       smtlib: encoded.solver.toSmtlib2(status),
       model: model.sexpr(),
       difficultyFacts: encoded.facts,
-      stats: { variables: Object.keys(encoded.variables).length, constraints: encoded.constraints }
+      stats: {
+        variables: Object.keys(encoded.variables).length,
+        constraints: encoded.constraints,
+      },
     };
   } catch (error) {
     return {
@@ -351,8 +386,9 @@ async function solve(request: SolveRequest): Promise<SolveResponse> {
       puzzleId: request.puzzleId,
       status: "error",
       durationMs: Math.round(performance.now() - started),
-      message: error instanceof Error ? error.message : "Unexpected solver failure.",
-      detail: error instanceof Error ? error.stack : undefined
+      message:
+        error instanceof Error ? error.message : "Unexpected solver failure.",
+      detail: error instanceof Error ? error.stack : undefined,
     };
   }
 }
@@ -362,7 +398,7 @@ const api: SolverApi = {
   async warm() {
     await localInitZ3();
     return { isolated: globalThis.crossOriginIsolated };
-  }
+  },
 };
 
 expose(api);

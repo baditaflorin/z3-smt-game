@@ -10,8 +10,8 @@ export default tseslint.config(
       "coverage/**",
       "playwright-report/**",
       "public/coi-serviceworker.min.js",
-      "test-results/**"
-    ]
+      "test-results/**",
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -21,13 +21,13 @@ export default tseslint.config(
       globals: {
         ...globals.browser,
         ...globals.node,
-        ...globals.worker
-      }
+        ...globals.worker,
+      },
     },
     rules: {
       "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-explicit-any": "error",
-      "no-console": ["error", { "allow": ["warn", "error"] }]
-    }
-  }
+      "no-console": ["error", { allow: ["warn", "error"] }],
+    },
+  },
 );

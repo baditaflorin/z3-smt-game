@@ -1,6 +1,9 @@
 let counter = 0;
 
-export async function renderMermaid(source: string, target: HTMLElement): Promise<void> {
+export async function renderMermaid(
+  source: string,
+  target: HTMLElement,
+): Promise<void> {
   const mermaid = await import("mermaid");
   mermaid.default.initialize({
     startOnLoad: false,
@@ -13,8 +16,8 @@ export async function renderMermaid(source: string, target: HTMLElement): Promis
       primaryBorderColor: "#15251f",
       lineColor: "#2c6f62",
       secondaryColor: "#d8efe8",
-      tertiaryColor: "#ffe1bd"
-    }
+      tertiaryColor: "#ffe1bd",
+    },
   });
 
   const id = `z3-smt-diagram-${counter++}`;

@@ -7,20 +7,20 @@ export default defineConfig({
   build: {
     outDir: "docs",
     emptyOutDir: false,
-    sourcemap: true,
+    sourcemap: false,
     rollupOptions: {
       output: {
         assetFileNames: "assets/[name]-[hash][extname]",
         chunkFileNames: "assets/[name]-[hash].js",
-        entryFileNames: "assets/[name]-[hash].js"
-      }
-    }
+        entryFileNames: "assets/[name]-[hash].js",
+      },
+    },
   },
   worker: {
-    format: "es"
+    format: "es",
   },
   test: {
     environment: "node",
-    include: ["src/**/*.test.ts", "tests/unit/**/*.test.ts"]
-  }
+    include: ["src/**/*.test.ts", "tests/unit/**/*.test.ts"],
+  },
 });

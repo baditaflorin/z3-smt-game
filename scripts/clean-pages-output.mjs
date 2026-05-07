@@ -9,7 +9,7 @@ const generated = [
   "coi-serviceworker.min.js",
   "favicon.svg",
   "index.html",
-  "manifest.webmanifest"
+  "manifest.webmanifest",
 ];
 
 for (const name of generated) {

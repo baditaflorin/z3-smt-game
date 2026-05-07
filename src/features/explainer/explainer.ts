@@ -6,7 +6,10 @@ export type LocalLlmSettings = {
   model: string;
 };
 
-export function deterministicExplanation(puzzle: Puzzle, response: SolveResponse): string {
+export function deterministicExplanation(
+  puzzle: Puzzle,
+  response: SolveResponse,
+): string {
   if (!response.ok) {
     return `Z3 could not finish this run: ${response.message}`;
   }
@@ -28,7 +31,7 @@ The puzzle has ${response.stats.variables} variables and about ${response.stats.
 export async function askLocalLlm(
   puzzle: Puzzle,
   response: SolveResponse,
-  settings: LocalLlmSettings
+  settings: LocalLlmSettings,
 ): Promise<string> {
   if (!response.ok) {
     return deterministicExplanation(puzzle, response);
@@ -50,29 +53,32 @@ export async function askLocalLlm(
     `Clues: ${puzzle.givens.join(" | ")}`,
     `Status: ${response.status}`,
     `Assignments: ${response.assignments.map((item) => `${item.label}=${item.value}`).join(", ")}`,
-    `SMT-LIB: ${response.smtlib}`
+    `SMT-LIB: ${response.smtlib}`,
   ].join("\n");
 
   const llmResponse = await fetch(endpoint, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       model,
       prompt,
       stream: false,
       options: {
-        temperature: 0.2
-      }
-    })
+        temperature: 0.2,
+      },
+    }),
   });
 
   if (!llmResponse.ok) {
     throw new Error(`Local LLM returned ${llmResponse.status}.`);
   }
 
-  const body = (await llmResponse.json()) as { response?: unknown; choices?: { text?: unknown }[] };
+  const body = (await llmResponse.json()) as {
+    response?: unknown;
+    choices?: { text?: unknown }[];
+  };
   if (typeof body.response === "string") {
     return body.response.trim();
   }

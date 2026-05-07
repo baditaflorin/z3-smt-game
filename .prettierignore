@@ -1,0 +1,10 @@
+docs/assets/
+docs/404.html
+docs/coi-serviceworker.min.js
+docs/index.html
+node_modules/
+package-lock.json
+playwright-report/
+public/coi-serviceworker.min.js
+test-results/
+tmp/

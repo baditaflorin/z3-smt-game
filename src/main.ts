@@ -1,10 +1,17 @@
-import { askLocalLlm, deterministicExplanation } from "./features/explainer/explainer";
+import {
+  askLocalLlm,
+  deterministicExplanation,
+} from "./features/explainer/explainer";
 import { renderMermaid } from "./features/diagram/mermaid";
 import { loadPuzzles } from "./features/puzzles/catalog";
 import type { Puzzle } from "./features/puzzles/schema";
 import { getSolverApi } from "./features/solver/client";
 import type { SolveResponse } from "./features/solver/types";
-import { readStoredState, writeStoredState, type StoredState } from "./shared/storage";
+import {
+  readStoredState,
+  writeStoredState,
+  type StoredState,
+} from "./shared/storage";
 import { appVersion, gitCommit, shortCommit } from "./shared/version";
 import "./styles.css";
 
@@ -33,19 +40,25 @@ window.addEventListener("error", (event) => {
 });
 
 window.addEventListener("unhandledrejection", (event) => {
-  showToast(event.reason instanceof Error ? event.reason.message : "Unexpected async error.");
+  showToast(
+    event.reason instanceof Error
+      ? event.reason.message
+      : "Unexpected async error.",
+  );
 });
 
 async function boot(): Promise<void> {
   const stored = readStoredState();
   const puzzles = await loadPuzzles();
-  const selected = puzzles.find((puzzle) => puzzle.id === stored.selectedPuzzleId) ?? puzzles[0];
+  const selected =
+    puzzles.find((puzzle) => puzzle.id === stored.selectedPuzzleId) ??
+    puzzles[0];
   state = {
     puzzles,
     selected,
     stored,
     explanation: "",
-    busy: false
+    busy: false,
   };
   render();
 }
@@ -56,7 +69,7 @@ function setSelected(puzzle: Puzzle): void {
     selected: puzzle,
     response: undefined,
     explanation: "",
-    stored: { ...state.stored, selectedPuzzleId: puzzle.id }
+    stored: { ...state.stored, selectedPuzzleId: puzzle.id },
   };
   writeStoredState(state.stored);
   render();
@@ -69,7 +82,9 @@ async function solveSelected(): Promise<void> {
   const response = await getSolverApi().solve({ puzzleId: state.selected.id });
   const completedPuzzleIds =
     response.ok && response.status === "sat"
-      ? Array.from(new Set([...state.stored.completedPuzzleIds, state.selected.id]))
+      ? Array.from(
+          new Set([...state.stored.completedPuzzleIds, state.selected.id]),
+        )
       : state.stored.completedPuzzleIds;
 
   state = {
@@ -77,7 +92,7 @@ async function solveSelected(): Promise<void> {
     busy: false,
     response,
     explanation: deterministicExplanation(state.selected, response),
-    stored: { ...state.stored, completedPuzzleIds }
+    stored: { ...state.stored, completedPuzzleIds },
   };
   writeStoredState(state.stored);
   render();
@@ -92,7 +107,8 @@ async function renderDiagram(response: SolveResponse): Promise<void> {
   try {
     await renderMermaid(response.diagram, target);
   } catch (error) {
-    target.textContent = error instanceof Error ? error.message : "Could not render diagram.";
+    target.textContent =
+      error instanceof Error ? error.message : "Could not render diagram.";
   }
 }
 
@@ -100,29 +116,34 @@ async function askLlm(): Promise<void> {
   const response = state.response;
   if (!response) return;
 
-  const endpoint = document.querySelector<HTMLInputElement>("#llm-endpoint")?.value ?? "";
-  const model = document.querySelector<HTMLInputElement>("#llm-model")?.value ?? "";
+  const endpoint =
+    document.querySelector<HTMLInputElement>("#llm-endpoint")?.value ?? "";
+  const model =
+    document.querySelector<HTMLInputElement>("#llm-model")?.value ?? "";
   state = {
     ...state,
     busy: true,
     stored: {
       ...state.stored,
       llmEndpoint: endpoint,
-      llmModel: model
-    }
+      llmModel: model,
+    },
   };
   writeStoredState(state.stored);
   render();
 
   try {
-    const explanation = await askLocalLlm(state.selected, response, { endpoint, model });
+    const explanation = await askLocalLlm(state.selected, response, {
+      endpoint,
+      model,
+    });
     state = { ...state, busy: false, explanation };
   } catch (error) {
     showToast(error instanceof Error ? error.message : "Local LLM failed.");
     state = {
       ...state,
       busy: false,
-      explanation: deterministicExplanation(state.selected, response)
+      explanation: deterministicExplanation(state.selected, response),
     };
   }
   render();
@@ -131,7 +152,7 @@ async function askLlm(): Promise<void> {
 
 function render(): void {
   const response = state.response;
-  const status = state.busy ? "initializing" : response?.status ?? "idle";
+  const status = state.busy ? "initializing" : (response?.status ?? "idle");
   appRoot.innerHTML = `
     <div class="app-shell">
       <header class="topbar">
@@ -168,7 +189,9 @@ function render(): void {
 }
 
 function renderPuzzleButton(puzzle: Puzzle): string {
-  const done = state.stored.completedPuzzleIds.includes(puzzle.id) ? " solved" : "";
+  const done = state.stored.completedPuzzleIds.includes(puzzle.id)
+    ? " solved"
+    : "";
   return `
     <button class="puzzle-card" type="button" data-puzzle-id="${escapeHtml(puzzle.id)}" aria-pressed="${
       puzzle.id === state.selected.id
@@ -251,7 +274,9 @@ function renderResult(response: SolveResponse): string {
   `;
 }
 
-function renderAssignments(response: Extract<SolveResponse, { ok: true }>): string {
+function renderAssignments(
+  response: Extract<SolveResponse, { ok: true }>,
+): string {
   if (response.assignments.length === 0) {
     return "<p>No assignments available.</p>";
   }
@@ -263,7 +288,7 @@ function renderAssignments(response: Extract<SolveResponse, { ok: true }>): stri
         ${response.assignments
           .map(
             (assignment) =>
-              `<tr><td>${escapeHtml(assignment.label)}</td><td>${escapeHtml(assignment.value)}</td></tr>`
+              `<tr><td>${escapeHtml(assignment.label)}</td><td>${escapeHtml(assignment.value)}</td></tr>`,
           )
           .join("")}
       </tbody>
@@ -272,26 +297,38 @@ function renderAssignments(response: Extract<SolveResponse, { ok: true }>): stri
 }
 
 function bindEvents(): void {
-  document.querySelectorAll<HTMLButtonElement>("[data-puzzle-id]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const puzzle = state.puzzles.find((candidate) => candidate.id === button.dataset.puzzleId);
-      if (puzzle) setSelected(puzzle);
+  document
+    .querySelectorAll<HTMLButtonElement>("[data-puzzle-id]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const puzzle = state.puzzles.find(
+          (candidate) => candidate.id === button.dataset.puzzleId,
+        );
+        if (puzzle) setSelected(puzzle);
+      });
     });
-  });
 
-  document.querySelector<HTMLButtonElement>("[data-solve]")?.addEventListener("click", () => {
-    void solveSelected();
-  });
+  document
+    .querySelector<HTMLButtonElement>("[data-solve]")
+    ?.addEventListener("click", () => {
+      void solveSelected();
+    });
 
-  document.querySelector<HTMLButtonElement>("[data-ask-llm]")?.addEventListener("click", () => {
-    void askLlm();
-  });
+  document
+    .querySelector<HTMLButtonElement>("[data-ask-llm]")
+    ?.addEventListener("click", () => {
+      void askLlm();
+    });
 
-  document.querySelector<HTMLButtonElement>("[data-copy-smt]")?.addEventListener("click", () => {
-    if (state.response?.ok) {
-      void navigator.clipboard.writeText(state.response.smtlib).then(() => showToast("SMT-LIB copied."));
-    }
-  });
+  document
+    .querySelector<HTMLButtonElement>("[data-copy-smt]")
+    ?.addEventListener("click", () => {
+      if (state.response?.ok) {
+        void navigator.clipboard
+          .writeText(state.response.smtlib)
+          .then(() => showToast("SMT-LIB copied."));
+      }
+    });
 }
 
 function showToast(message: string): void {

@@ -16,11 +16,11 @@ const rawPuzzles: Puzzle[] = [
       "The Key was found in the Library.",
       "Ada found the Map.",
       "Cora was not in the Atrium.",
-      "The Lens was found in the Workshop."
+      "The Lens was found in the Workshop.",
     ],
     variables: 6,
     constraints: 15,
-    skill: "Finite-domain matching with two all-different groups."
+    skill: "Finite-domain matching with two all-different groups.",
   },
   {
     schemaVersion: 1,
@@ -36,11 +36,11 @@ const rawPuzzles: Puzzle[] = [
       "Circuits is exactly third.",
       "Encoding happens after Axioms.",
       "Demos happens after Circuits.",
-      "Encoding is not first or last."
+      "Encoding is not first or last.",
     ],
     variables: 5,
     constraints: 18,
-    skill: "Ordering, adjacency, and all-different propagation."
+    skill: "Ordering, adjacency, and all-different propagation.",
   },
   {
     schemaVersion: 1,
@@ -56,12 +56,12 @@ const rawPuzzles: Puzzle[] = [
       "Green weighs 2 more than Red.",
       "Blue is heavier than Green.",
       "Red weighs an odd number.",
-      "Blue weighs less than 8."
+      "Blue weighs less than 8.",
     ],
     variables: 3,
     constraints: 17,
-    skill: "Integer arithmetic mixed with finite domains."
-  }
+    skill: "Integer arithmetic mixed with finite domains.",
+  },
 ];
 
 const queryClient = new QueryClient({
@@ -69,15 +69,15 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: Infinity,
       gcTime: Infinity,
-      retry: false
-    }
-  }
+      retry: false,
+    },
+  },
 });
 
 export async function loadPuzzles(): Promise<Puzzle[]> {
   return queryClient.fetchQuery({
     queryKey: ["puzzles", 1],
-    queryFn: async () => puzzleCatalogSchema.parse(rawPuzzles)
+    queryFn: async () => puzzleCatalogSchema.parse(rawPuzzles),
   });
 }
 

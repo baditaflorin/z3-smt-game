@@ -10,7 +10,7 @@ export const puzzleSchema = z.object({
   givens: z.array(z.string().min(1)).min(1),
   variables: z.number().int().positive(),
   constraints: z.number().int().positive(),
-  skill: z.string().min(1)
+  skill: z.string().min(1),
 });
 
 export const puzzleCatalogSchema = z.array(puzzleSchema).min(1);
