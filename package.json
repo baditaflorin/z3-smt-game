@@ -1,0 +1,45 @@
+{
+  "name": "z3-smt-game",
+  "version": "0.1.0",
+  "description": "A browser puzzle lab where Z3-WASM solves logic games and a local LLM explains the constraints.",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "scripts": {
+    "sync-public-assets": "node scripts/sync-public-assets.mjs",
+    "postinstall": "npm run sync-public-assets",
+    "predev": "npm run sync-public-assets",
+    "dev": "vite --host 127.0.0.1",
+    "prebuild": "npm run sync-public-assets && node scripts/clean-pages-output.mjs",
+    "build": "vite build && node scripts/write-pages-fallback.mjs",
+    "prepreview": "npm run sync-public-assets",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run --coverage=false",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check .",
+    "presmoke": "npm run sync-public-assets",
+    "smoke": "bash scripts/smoke.sh"
+  },
+  "dependencies": {
+    "@tanstack/query-core": "^5.90.7",
+    "coi-serviceworker": "^0.1.7",
+    "comlink": "^4.4.2",
+    "mermaid": "^11.12.1",
+    "z3-solver": "^4.15.4",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.9.1",
+    "eslint": "^9.39.1",
+    "globals": "^16.4.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2",
+    "vite": "^7.1.12",
+    "vitest": "^3.2.4"
+  }
+}

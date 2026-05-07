@@ -12,7 +12,7 @@ The live GitHub Pages URL is a first-class deliverable. The app must work from a
 
 Publish from the `main` branch `/docs` folder.
 
-The Vite build outputs directly to `docs/`. The configured base path is `/z3-smt-game/`. The build writes hashed assets under `docs/assets/`, preserves `docs/.nojekyll`, and copies `docs/index.html` to `docs/404.html` for SPA-style fallback safety.
+The Vite build outputs directly to `docs/`. The configured base path is `/z3-smt-game/`. The build writes hashed assets under `docs/assets/`, preserves documentation files such as `docs/adr/`, preserves `docs/.nojekyll`, and copies `docs/index.html` to `docs/404.html` for SPA-style fallback safety. A prebuild cleanup removes generated Pages assets without deleting handwritten documentation.
 
 The live URL is `https://baditaflorin.github.io/z3-smt-game/`.
 

@@ -1,0 +1,17 @@
+{
+  "name": "Z3 SMT Game",
+  "short_name": "Z3 SMT",
+  "description": "A browser puzzle lab where Z3-WASM solves logic games and a local LLM explains the constraints.",
+  "start_url": "/z3-smt-game/",
+  "scope": "/z3-smt-game/",
+  "display": "standalone",
+  "background_color": "#f6f3e7",
+  "theme_color": "#15251f",
+  "icons": [
+    {
+      "src": "/z3-smt-game/favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml"
+    }
+  ]
+}
