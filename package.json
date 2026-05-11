@@ -27,7 +27,7 @@
     "@tanstack/query-core": "^5.90.7",
     "coi-serviceworker": "^0.1.7",
     "comlink": "^4.4.2",
-    "mermaid": "^11.12.1",
+    "mermaid": "^11.15.0",
     "z3-solver": "^4.15.4",
     "zod": "^4.1.12"
   },
